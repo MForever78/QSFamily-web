@@ -1,0 +1,21 @@
+{
+  "name": "QSFamily-web",
+  "version": "0.0.0",
+  "homepage": "https://github.com/MForever78/QSFamily-web",
+  "authors": [
+    "MForever78 <shunjian1128@gmail.com>"
+  ],
+  "main": "index.html",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "semantic-ui": "~1.12.2",
+    "normalize.css": "~3.0.3",
+  }
+}

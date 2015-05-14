@@ -1,0 +1,31 @@
+{
+  "name": "qsfamily-web",
+  "version": "1.0.0",
+  "description": "QSFamily web front end source code",
+  "main": "index.html",
+  "dependencies": {
+    "page": "^1.6.3",
+    "vue": "^0.11.10"
+  },
+  "devDependencies": {
+    "css-loader": "^0.12.0",
+    "html-loader": "^0.3.0",
+    "less-loader": "^2.2.0",
+    "style-loader": "^0.12.2",
+    "webpack": "^1.9.4"
+  },
+  "scripts": {
+    "dev": "webpack --watch",
+    "build": "webpack -p"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MForever78/QSFamily-web.git"
+  },
+  "author": "MForever78",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MForever78/QSFamily-web/issues"
+  },
+  "homepage": "https://github.com/MForever78/QSFamily-web#readme"
+}
