@@ -4,7 +4,12 @@
   "description": "QSFamily web front end source code",
   "main": "index.html",
   "dependencies": {
+    "bluebird": "^2.9.27",
+    "config": "^1.13.0",
+    "jquery": "^2.1.4",
+    "normalize.css": "^3.0.3",
     "page": "^1.6.3",
+    "superagent": "^1.2.0",
     "vue": "^0.11.10"
   },
   "devDependencies": {

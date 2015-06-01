@@ -24,18 +24,17 @@
     <meta name="msapplication-TileColor" content="#00a300">
     <meta name="msapplication-TileImage" content="/mstile-144x144.png">
     <meta name="theme-color" content="#ffffff">
-    <link rel="stylesheet" href="bower_components/normalize.css/normalize.css">
-    <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="build/app.js"></script>
 </head>
 <body>
-    <div id="header">
-        <div class="brand">轻松家园</div>
-        <ul class="nav">
-            <li class="nav-item" v-repeat="items"></li>
+    <header>
+        <a href="/" id="logo">
+            <img src="img/logo.png" alt="轻松家园"/>
+            <span class="brand">轻松家园</span>
+        </a>
+        <ul id="nav">
+            <li v-repeat="nav-item">{{ item }}</li>
         </ul>
-    </div>
-    <div id="message"></div>
-    <div id="main"></div>
+    </header>
 </body>
 </html>
