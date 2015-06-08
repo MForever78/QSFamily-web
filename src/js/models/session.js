@@ -34,6 +34,7 @@ var SessionModel = Backbone.Model.extend({
 
   initialize: function(opt) {
     this.baseURL = opt.baseURL;
+    this.salt = opt.salt;
     this.token = localStorage.getItem("QSFamily-token");
     this.userid = localStorage.getItem("QSFamily-user-id");
   },
@@ -42,20 +43,20 @@ var SessionModel = Backbone.Model.extend({
     return this.token && this.userid;
   },
 
-  login: function(username, password) {
+  login: function(role, username, password) {
     var self = this;
     return new Promise(function(resolve, reject) {
       var sha256 = createHash('sha256');
       self.ajax("login", {
         data: {
-          role: 'teacher',
+          role: role,
           username: username,
-          password: sha256.update(self.salt).update(password).digest('hex')
+          password: sha256.update(self.salt, 'utf8').update(password, 'utf8').digest('hex')
         },
         method: 'POST'
       }).then(function(result) {
         self.token = result.token;
-        self.userid = reqsult.userid;
+        self.userid = result.userid;
         self.saveStorage();
         resolve(null);
       }).catch(function(err) {

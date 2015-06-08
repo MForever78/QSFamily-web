@@ -3,9 +3,12 @@
 <head lang="zh">
     <meta charset="UTF-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <base href="/">
     <title>轻松家园</title>
     <meta name="description" content="轻松家园课程网站">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+
     <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
@@ -24,19 +27,85 @@
     <meta name="msapplication-TileColor" content="#00a300">
     <meta name="msapplication-TileImage" content="/mstile-144x144.png">
     <meta name="theme-color" content="#ffffff">
-    <script src="build/app.js"></script>
+
+    <link rel="stylesheet" href="bower_components/normalize.css/normalize.css"/>
+    <link rel="stylesheet" href="bower_components/semantic-ui/dist/semantic.min.css"/>
+    <link rel="stylesheet" href="static/css/main.min.css"/>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/bluebird/js/browser/bluebird.min.js"></script>
+    <script src="bower_components/underscore/underscore-min.js"></script>
+    <script src="bower_components/backbone/backbone-min.js"></script>
+    <script src="bower_components/semantic-ui/dist/semantic.min.js"></script>
+    <script src="static/js/app.js"></script>
 </head>
 <body>
-    <header>
-        <a href="/" id="logo">
-            <img src="img/logo.png" alt="轻松家园"/>
-            <span class="brand">轻松家园</span>
+    <header id="header">
+        <a id="brand" href="/">
+            <img src="img/logo.png" alt="" id="logo"/>
+            <span id="title">轻松家园</span>
         </a>
-        <!--
-        <ul id="nav">
-            <li v-repeat="nav-item">{{ item }}</li>
-        </ul>
-        -->
+        <nav id="navbar">
+            <ul id="main-nav">
+                <li id="nav-index"><a href="/">首页</a></li>
+                <li id="nav-course"><a href="/course">课程</a></li>
+                <li id="nav-login"><a href="/login">登入</a></li>
+                <li id="nav-signup"><a href="/signup">注册</a></li>
+            </ul>
+        </nav>
     </header>
+    <div id="message"></div>
+    <div id="error"></div>
+    <div id="main"></div>
+    <script type="text/template" id="index-template">
+        <div id="post-wrap">
+            <% _.each(newsList, function(news) { %>
+            <article>
+                <div class="post-title"><a href="/news/<%= news.id %>"><%= news.title %></a></div>
+                <div class="post-meta">
+                    <span class="post-date"><%= news.date.getFullYear() %> 年 <%= news.date.getMonth() + 1 %> 月 <%= news.date.getDate() %> 日</span>
+                    <span class="post-author"><%= news.author %></span>
+                </div>
+                <div class="post-content"><%= news.content %></div>
+            </article>
+            <% }); %>
+        </div>
+    </script>
+    <script type="text/template" id="login-template">
+        <div id="login-wrap">
+            <form action="javascript:void(0)" id="login" class="ui form">
+                <div class="fileds">
+                    <div class="required filed">
+                        <label for="username">用户名</label>
+                        <div class="ui input">
+                            <input id="username" type="text" placeholder="Username"/>
+                        </div>
+                    </div>
+                    <div class="required filed">
+                        <label for="password">密码</label>
+                        <div class="ui input">
+                            <input id="password" type="password" placeholder="Password"/>
+                        </div>
+                    </div>
+                </div>
+                <div id="role" class="ui labeled icon menu">
+                    <a class="green item active" data-role="student">
+                        <i class="icon child"></i>
+                        学生
+                    </a>
+                    <a class="yellow item" data-role="assistant">
+                        <i class="icon spy"></i>
+                        助教
+                    </a>
+                    <a class="blue item" data-role="teacher">
+                        <i class="icon doctor"></i>
+                        教师
+                    </a>
+                </div>
+                <div class="field">
+                    <div id="submit" class="ui submit positive button">登入</div>
+                </div>
+            </form>
+        </div>
+    </script>
 </body>
 </html>

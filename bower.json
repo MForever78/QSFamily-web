@@ -5,7 +5,6 @@
   "authors": [
     "MForever78 <shunjian1128@gmail.com>"
   ],
-  "main": "index.html",
   "license": "MIT",
   "ignore": [
     "**/.*",
@@ -15,7 +14,11 @@
     "tests"
   ],
   "dependencies": {
-    "semantic-ui": "~1.12.2",
+    "underscore": "~1.8.3",
+    "backbone": "~1.2.0",
+    "jquery": "~2.1.4",
+    "bluebird": "~2.9.27",
     "normalize.css": "~3.0.3",
+    "semantic-ui": "~1.12.3"
   }
 }

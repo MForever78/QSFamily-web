@@ -1,37 +1,32 @@
 {
-  "name": "qsfamily-web",
+  "name": "qsfamily",
   "version": "1.0.0",
   "description": "QSFamily web front end source code",
   "main": "index.html",
-  "dependencies": {
-    "bluebird": "^2.9.27",
-    "config": "^1.13.0",
-    "jquery": "^2.1.4",
-    "normalize.css": "^3.0.3",
-    "page": "^1.6.3",
-    "simditor": "^2.1.12",
-    "superagent": "^1.2.0",
-    "vue": "^0.11.10"
-  },
-  "devDependencies": {
-    "css-loader": "^0.12.0",
-    "html-loader": "^0.3.0",
-    "less-loader": "^2.2.0",
-    "style-loader": "^0.12.2",
-    "webpack": "^1.9.4"
-  },
   "scripts": {
-    "dev": "webpack --watch",
-    "build": "webpack -p"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MForever78/QSFamily-web.git"
   },
   "author": "MForever78",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/MForever78/QSFamily-web/issues"
   },
-  "homepage": "https://github.com/MForever78/QSFamily-web#readme"
+  "homepage": "https://github.com/MForever78/QSFamily-web#readme",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-autoprefixer": "^2.3.1",
+    "gulp-browserify": "^0.5.1",
+    "gulp-concat": "^2.5.2",
+    "gulp-less": "^3.0.3",
+    "gulp-livereload": "^3.8.0",
+    "gulp-minify-css": "^1.1.5",
+    "gulp-rename": "^1.2.2"
+  },
+  "dependencies": {
+    "sha.js": "^2.4.2"
+  }
 }
