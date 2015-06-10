@@ -2,6 +2,9 @@
  * Created by MForever78 on 15/6/8.
  */
 
+var MessageView = require('./message');
+var NavView = require('./nav');
+
 var LoginView = Backbone.View.extend({
   initialize: function(opt) {
     this.sessionModel = opt.sessionModel;
@@ -10,8 +13,12 @@ var LoginView = Backbone.View.extend({
   },
 
   render: function() {
-    $("#main-nav .is-active").removeClass("is-active");
-    $("#nav-login").addClass("is-active");
+    var navView = NavView.instance || new NavView({
+      sessionModel: this.sessionModel
+    });
+    navView.render({
+      id: 'login'
+    });
     var template = _.template($("#login-template").html());
     this.$el.html(template({}));
   },
@@ -24,9 +31,16 @@ var LoginView = Backbone.View.extend({
       var password = this.$el.find('#password').val();
       var self = this;
       this.sessionModel.login(role, username, password).then(function() {
+        console.log('login success');
         self.router.navigate('', { trigger: true });
-      }).catch(function(err) {
-        console.log(err);
+      }).catch(function(data) {
+        var messageView = MessageView.instance || new MessageView;
+        messageView.display({
+          message: "用户名或密码错误",
+          type: "error",
+          parent: self.$el.find("#login-wrap"),
+          icon: 'info'
+        });
       });
     },
 
