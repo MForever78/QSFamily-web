@@ -4,7 +4,7 @@
 
 var SessionModel = require('./models/session');
 var sessionModel = new SessionModel({
-  baseURL: 'http://127.0.0.1:3000/',
+  baseURL: 'http://qsfamily.mforever78.com:3000/',
   salt: '123456'
 });
 
@@ -15,7 +15,8 @@ var Router = Backbone.Router.extend({
   routes: {
     "": "index",
     "login": "login",
-    "logout": "logout"
+    "logout": "logout",
+    "write": "write"
 
     //"*notFound": "notFound"
   },
@@ -50,7 +51,17 @@ var Router = Backbone.Router.extend({
 
   logout: function() {
     sessionModel.logout();
-    this.navigate('', {trigger: true});
+    window.location.href = '';
+  },
+
+  write: function() {
+    var WriteView = require('./views/write');
+    new WriteView({
+      el: $('#main'),
+      sessionModel: sessionModel,
+      newsModel: newsModel,
+      router: this
+    });
   }
 
   /*

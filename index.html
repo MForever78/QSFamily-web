@@ -29,7 +29,6 @@
     <meta name="theme-color" content="#ffffff">
 
     <link rel="stylesheet" href="bower_components/normalize.css/normalize.css"/>
-    <link rel="stylesheet" href="bower_components/semantic-ui/dist/semantic.min.css"/>
     <link rel="stylesheet" href="static/css/main.min.css"/>
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bluebird/js/browser/bluebird.min.js"></script>
@@ -44,18 +43,20 @@
             <img src="img/logo.png" alt="" id="logo"/>
             <span id="title">轻松家园</span>
         </a>
-        <nav id="navbar">
-            <ul id="main-nav">
-                <li id="nav-index"><a href="/">首页</a></li>
-                <li id="nav-course"><a href="/course">课程</a></li>
-                <li id="nav-login"><a href="/login">登入</a></li>
-                <li id="nav-signup"><a href="/signup">注册</a></li>
-            </ul>
-        </nav>
+        <nav id="navbar"></nav>
     </header>
-    <div id="message"></div>
-    <div id="error"></div>
     <div id="main"></div>
+    <script type="text/template" id="nav-template">
+        <ul id="main-nav">
+            <% _.each(navList, function(nav) { %>
+            <li id="nav-<%= nav.id %>">
+                <a href="<%= nav.url %>">
+                    <%= nav.name %>
+                </a>
+            </li>
+            <% }); %>
+        </ul>
+    </script>
     <script type="text/template" id="index-template">
         <div id="post-wrap">
             <% _.each(newsList, function(news) { %>
@@ -103,6 +104,23 @@
                 </div>
                 <div class="field">
                     <div id="submit" class="ui submit positive button">登入</div>
+                </div>
+            </form>
+        </div>
+    </script>
+    <script type="text/template" id="write-template">
+        <div id="write-wrap">
+            <form action="javascript:void(0)" class="ui form">
+                <div class="field">
+                    <label for="news-title">标题</label>
+                    <input id="news-title" type="text"/>
+                </div>
+                <div class="field">
+                    <label for="news-content">内容</label>
+                    <textarea id="news-content" cols="30" rows="10"></textarea>
+                </div>
+                <div class="field">
+                    <div id="news-submit" class="ui submit button green">发布</div>
                 </div>
             </form>
         </div>

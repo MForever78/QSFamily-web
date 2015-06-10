@@ -30,6 +30,23 @@ var NewsModel = Backbone.Model.extend({
         resolve(news);
       });
     });
+  },
+
+  postNews: function(title, content) {
+    var self = this;
+    return new Promise(function(resolve) {
+      self.sessionModel.ajax('news/post', {
+        method: 'POST',
+        data: JSON.stringify({
+          token: self.sessionModel.token,
+          title: title,
+          content: content
+        }),
+        contentType: 'application/json'
+      }).then(function () {
+        resolve(null);
+      });
+    })
   }
 });
 

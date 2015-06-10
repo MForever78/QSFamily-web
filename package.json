@@ -27,6 +27,7 @@
     "gulp-rename": "^1.2.2"
   },
   "dependencies": {
-    "sha.js": "^2.4.2"
+    "sha.js": "^2.4.2",
+    "simditor": "^2.1.13"
   }
 }
