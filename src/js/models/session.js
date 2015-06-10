@@ -3,6 +3,7 @@
  */
 
 var createHash = require('sha.js');
+var MessageView = require('../views/message');
 
 var SessionModel = Backbone.Model.extend({
   ajax: function(url, opt) {
@@ -11,8 +12,7 @@ var SessionModel = Backbone.Model.extend({
       _.extend(opt, {
         success: function(data) {
           if (data.code !== 200) {
-            // TODO: display in error view
-            console.log(data);
+            reject(data);
             if (data.code === 404 || data.code === 403) {
               self.logout();
               window.location.href = '/';
@@ -21,12 +21,15 @@ var SessionModel = Backbone.Model.extend({
             resolve(data);
           }
         },
-        error: function(data) {
-          reject(data);
+        error: function(err) {
+          new MessageView({
+            message: "网络请求错误, 请稍后再试",
+            type: 'error',
+            parent: $("#main")
+          });
         },
-        cache: false,
-        dataType: 'jsonp',
-        contentType: 'application/json'
+        dataType: 'json',
+        cache: false
       });
       $.ajax(self.baseURL + url, opt);
     });
@@ -48,12 +51,13 @@ var SessionModel = Backbone.Model.extend({
     return new Promise(function(resolve, reject) {
       var sha256 = createHash('sha256');
       self.ajax("login", {
-        data: {
+        data: JSON.stringify({
           role: role,
           username: username,
           password: sha256.update(self.salt, 'utf8').update(password, 'utf8').digest('hex')
-        },
-        method: 'POST'
+        }),
+        method: 'POST',
+        contentType: 'application/json'
       }).then(function(result) {
         self.token = result.token;
         self.userid = result.userid;
