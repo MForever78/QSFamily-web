@@ -21,13 +21,13 @@ var NewsModel = Backbone.Model.extend({
   getNewsById: function(id) {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news', {
+      self.sessionModel.ajax('news/' + id, {
         method: 'GET',
         data: {
-          newsid: id
+          token: self.sessionModel.token
         }
-      }).then(function(news) {
-        resolve(news);
+      }).then(function(data) {
+        resolve(data);
       });
     });
   },
@@ -47,6 +47,57 @@ var NewsModel = Backbone.Model.extend({
         resolve(null);
       });
     })
+  },
+
+  editNews: function(id, title, content) {
+    var self = this;
+    return new Promise(function(resolve) {
+      self.sessionModel.ajax('news/edit', {
+        method: 'POST',
+        data: JSON.stringify({
+          token: self.sessionModel.token,
+          newsid: id,
+          title: title,
+          content: content
+        }),
+        contentType: 'application/json'
+      }).then(function() {
+        resolve(null);
+      });
+    });
+  },
+
+  deleteNews: function(id) {
+    var self = this;
+    return new Promise(function(resolve) {
+      self.sessionModel.ajax('news/delete', {
+        method: 'POST',
+        data: JSON.stringify({
+          token: self.sessionModel.token,
+          newsid: id
+        }),
+        contentType: 'application/json'
+      }).then(function() {
+        resolve(null);
+      });
+    });
+  },
+
+  updateNews: function(id, news) {
+    var self = this;
+    return new Promise(function(resolve) {
+      self.sessionModel.ajax('news/update', {
+        method: 'POST',
+        data: JSON.stringify({
+          token: self.sessionModel.token,
+          newsid: id,
+          news: news
+        }),
+        contentType: 'application/json'
+      }).then(function() {
+        resolve(null);
+      });
+    });
   }
 });
 
