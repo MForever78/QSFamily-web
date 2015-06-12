@@ -38,7 +38,7 @@ var LoginView = Backbone.View.extend({
         messageView.display({
           message: "用户名或密码错误",
           type: "error",
-          parent: self.$el.find("#login-wrap"),
+          parent: $("#login-wrap"),
           icon: 'info'
         });
       });
