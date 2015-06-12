@@ -17284,7 +17284,7 @@ return uploader;
 
 var SessionModel = require('./models/session');
 var sessionModel = new SessionModel({
-  baseURL: 'http://qsfamily.mforever78.com:3000/',
+  baseURL: 'http://127.0.0.1:3000/',
   salt: '123456'
 });
 
@@ -17294,9 +17294,11 @@ var newsModel = new NewsModel({ sessionModel: sessionModel });
 var Router = Backbone.Router.extend({
   routes: {
     "": "index",
+    "news/:id": "news",
     "login": "login",
     "logout": "logout",
-    "write": "write"
+    "write": "write",
+    "edit/:id": "edit"
 
     //"*notFound": "notFound"
   },
@@ -17317,6 +17319,17 @@ var Router = Backbone.Router.extend({
       el: $('#main'),
       sessionModel: sessionModel,
       newsModel: newsModel
+    });
+  },
+
+  news: function(newsid) {
+    var NewsView = require("./views/news");
+    new NewsView({
+      el: $("#main"),
+      sessionModel: sessionModel,
+      newsModel: newsModel,
+      newsid: newsid,
+      router: this
     });
   },
 
@@ -17342,6 +17355,17 @@ var Router = Backbone.Router.extend({
       newsModel: newsModel,
       router: this
     });
+  },
+
+  edit: function(newsid) {
+    var EditView = require('./views/edit');
+    new EditView({
+      el: $('#main'),
+      sessionModel: sessionModel,
+      newsModel: newsModel,
+      newsid: newsid,
+      router: this
+    });
   }
 
   /*
@@ -17364,7 +17388,7 @@ $(function() {
   });
 });
 
-},{"./models/news":19,"./models/session":20,"./views/index":21,"./views/login":22,"./views/write":25}],19:[function(require,module,exports){
+},{"./models/news":19,"./models/session":20,"./views/edit":21,"./views/index":22,"./views/login":23,"./views/news":26,"./views/write":27}],19:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/7.
  */
@@ -17388,13 +17412,13 @@ var NewsModel = Backbone.Model.extend({
   getNewsById: function(id) {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news', {
+      self.sessionModel.ajax('news/' + id, {
         method: 'GET',
         data: {
-          newsid: id
+          token: self.sessionModel.token
         }
-      }).then(function(news) {
-        resolve(news);
+      }).then(function(data) {
+        resolve(data);
       });
     });
   },
@@ -17414,6 +17438,57 @@ var NewsModel = Backbone.Model.extend({
         resolve(null);
       });
     })
+  },
+
+  editNews: function(id, title, content) {
+    var self = this;
+    return new Promise(function(resolve) {
+      self.sessionModel.ajax('news/edit', {
+        method: 'POST',
+        data: JSON.stringify({
+          token: self.sessionModel.token,
+          newsid: id,
+          title: title,
+          content: content
+        }),
+        contentType: 'application/json'
+      }).then(function() {
+        resolve(null);
+      });
+    });
+  },
+
+  deleteNews: function(id) {
+    var self = this;
+    return new Promise(function(resolve) {
+      self.sessionModel.ajax('news/delete', {
+        method: 'POST',
+        data: JSON.stringify({
+          token: self.sessionModel.token,
+          newsid: id
+        }),
+        contentType: 'application/json'
+      }).then(function() {
+        resolve(null);
+      });
+    });
+  },
+
+  updateNews: function(id, news) {
+    var self = this;
+    return new Promise(function(resolve) {
+      self.sessionModel.ajax('news/update', {
+        method: 'POST',
+        data: JSON.stringify({
+          token: self.sessionModel.token,
+          newsid: id,
+          news: news
+        }),
+        contentType: 'application/json'
+      }).then(function() {
+        resolve(null);
+      });
+    });
   }
 });
 
@@ -17504,7 +17579,74 @@ var SessionModel = Backbone.Model.extend({
 
 module.exports = SessionModel;
 
-},{"../views/message":23,"sha.js":5}],21:[function(require,module,exports){
+},{"../views/message":24,"sha.js":5}],21:[function(require,module,exports){
+/**
+ * Created by MForever78 on 15/6/12.
+ */
+
+var MessageView = require("./message");
+var NavView = require("./nav");
+var Simditor = require("simditor");
+
+var EditView = Backbone.View.extend({
+  initialize: function(opt) {
+    this.newsModel = opt.newsModel;
+    this.sessionModel = opt.sessionModel;
+    this.router = opt.router;
+    this.newsid = opt.newsid;
+    this.render();
+  },
+
+  events: {
+    "click #news-submit": "update"
+  },
+
+  render: function() {
+    var navView = NavView.instance || new NavView({
+      sessionModel: this.sessionModel
+    });
+    navView.render({
+      id: 'edit'
+    });
+    var template = _.template($("#write-template").html());
+    this.$el.html(template());
+    this.editor = new Simditor({
+      textarea: $("#news-content")
+    });
+    var self = this;
+    this.newsModel.getNewsById(this.newsid)
+      .then(function(data) {
+        $("#news-title").val(data.news.title);
+        self.editor.setValue(data.news.content);
+      });
+  },
+
+  update: function() {
+    var news = {
+      title: $("#news-title").val(),
+      content: this.editor.getValue()
+    };
+    var self = this;
+    this.newsModel.updateNews(this.newsid, news)
+      .then(function() {
+        var messageView = MessageView.instance || new MessageView({
+          sessionModel: this.sessionModel
+        });
+        messageView.display({
+          type: 'success',
+          parent: $("#write-wrap"),
+          message: "更新成功",
+          icon: "checkmark"
+        });
+        setTimeout(function() {
+          self.router.navigate("news/" + self.newsid, { trigger: true })
+        }, 600);
+      });
+  }
+});
+
+module.exports = EditView;
+},{"./message":24,"./nav":25,"simditor":13}],22:[function(require,module,exports){
 var NavView = require("./nav");
 
 var IndexView = Backbone.View.extend({
@@ -17535,7 +17677,7 @@ var IndexView = Backbone.View.extend({
 
 module.exports = IndexView;
 
-},{"./nav":24}],22:[function(require,module,exports){
+},{"./nav":25}],23:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/8.
  */
@@ -17576,7 +17718,7 @@ var LoginView = Backbone.View.extend({
         messageView.display({
           message: "用户名或密码错误",
           type: "error",
-          parent: self.$el.find("#login-wrap"),
+          parent: $("#login-wrap"),
           icon: 'info'
         });
       });
@@ -17597,7 +17739,7 @@ var LoginView = Backbone.View.extend({
 
 module.exports = LoginView;
 
-},{"./message":23,"./nav":24}],23:[function(require,module,exports){
+},{"./message":24,"./nav":25}],24:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/9.
  */
@@ -17624,7 +17766,7 @@ var MessageView = Backbone.View.extend({
 });
 
 module.exports = MessageView;
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/10.
  */
@@ -17699,7 +17841,75 @@ var NavView = Backbone.View.extend({
 
 module.exports = NavView;
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
+/**
+ * Created by MForever78 on 15/6/11.
+ */
+
+var MessageView = require("./message");
+var NavView = require("./nav");
+
+var NewsView = Backbone.View.extend({
+  initialize: function(opt) {
+    this.sessionModel = opt.sessionModel;
+    this.newsModel = opt.newsModel;
+    this.newsid = opt.newsid;
+    this.router = opt.router;
+    this.render();
+  },
+
+  events: {
+    "click #edit": "editNews",
+    "click #delete": "deleteNews"
+  },
+
+  render: function() {
+    var navView = NavView.instance || new NavView({
+      sessionModel: this.sessionModel
+    });
+    navView.render({
+      id: 'index'
+    });
+    var template = _.template($("#news-template").html());
+    var self = this;
+    this.newsModel.getNewsById(this.newsid)
+      .then(function(data) {
+        data.news.date = new Date(data.news.create_at);
+        var editable = data.role === 'teacher';
+        self.$el.html(template({
+          editable: editable,
+          news: data.news
+        })).hide().fadeIn(300);
+      });
+  },
+
+  editNews: function(event) {
+    event.preventDefault();
+    this.router.navigate("edit/" + this.newsid, { trigger: true });
+  },
+
+  deleteNews: function(event) {
+    event.preventDefault();
+    var self = this;
+    this.newsModel.deleteNews(this.newsid)
+      .then(function() {
+        var messageView = MessageView.instance || new MessageView;
+        messageView.display({
+          type: 'success',
+          message: "删除成功",
+          parent: $("#post-wrap"),
+          icon: "checkmark"
+        });
+        setTimeout(function() {
+          self.router.navigate("", { trigger: true });
+        }, 600);
+      });
+  }
+});
+
+module.exports = NewsView;
+
+},{"./message":24,"./nav":25}],27:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/9.
  */
@@ -17746,4 +17956,4 @@ var WriteView = Backbone.View.extend({
 
 module.exports = WriteView;
 
-},{"./nav":24,"simditor":13}]},{},[18])
+},{"./nav":25,"simditor":13}]},{},[18])
