@@ -4,7 +4,6 @@
 
 var MessageView = require("./message");
 var NavView = require("./nav");
-var Simditor = require("simditor");
 
 var EditView = Backbone.View.extend({
   initialize: function(opt) {
@@ -28,14 +27,22 @@ var EditView = Backbone.View.extend({
     });
     var template = _.template($("#write-template").html());
     this.$el.html(template());
-    this.editor = new Simditor({
-      textarea: $("#news-content")
-    });
     var self = this;
-    this.newsModel.getNewsById(this.newsid)
-      .then(function(data) {
-        $("#news-title").val(data.news.title);
-        self.editor.setValue(data.news.content);
+    $.getScript("/static/lib/simditor.min.js")
+      .done(function() {
+        console.log("succeed");
+        self.editor = new Simditor({
+          textarea: $("#news-content")
+        });
+        self.newsModel.getNewsById(self.newsid)
+          .then(function(data) {
+            $("#news-title").val(data.news.title);
+            self.editor.setValue(data.news.content);
+          });
+      })
+      .fail(function() {
+        console.log("failed");
+        alert(arguments[2].toString());
       });
   },
 

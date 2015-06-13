@@ -2,7 +2,6 @@
  * Created by MForever78 on 15/6/9.
  */
 
-var Simditor = require('simditor');
 var NavView = require('./nav');
 
 var WriteView = Backbone.View.extend({
@@ -22,8 +21,11 @@ var WriteView = Backbone.View.extend({
     });
     var template = _.template($("#write-template").html());
     this.$el.html(template({}));
-    this.editor = new Simditor({
-      textarea: $("#news-content")
+    var self = this;
+    $.getScript("/static/lib/simditor.min.js", function() {
+      self.editor = new Simditor({
+        textarea: $("#news-content")
+      });
     });
   },
 
