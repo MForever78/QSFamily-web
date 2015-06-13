@@ -39,7 +39,8 @@ var LoginView = Backbone.View.extend({
           message: "用户名或密码错误",
           type: "error",
           parent: $("#login-wrap"),
-          icon: 'info'
+          icon: 'info',
+          fadeOut: true
         });
       });
     },

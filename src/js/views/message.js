@@ -20,6 +20,9 @@ var MessageView = Backbone.View.extend({
       }));
     }
     $el.prependTo(opt.parent);
+    if (opt.fadeOut) {
+      $el.delay(600).fadeOut(300);
+    }
   }
 });
 
