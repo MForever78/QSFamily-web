@@ -4,7 +4,7 @@
 
 var SessionModel = require('./models/session');
 var sessionModel = new SessionModel({
-  baseURL: 'http://127.0.0.1:3000/',
+  baseURL: 'http://qsfamily.mforever78.com:3000/',
   salt: '123456'
 });
 
@@ -18,20 +18,24 @@ var Router = Backbone.Router.extend({
     "login": "login",
     "logout": "logout",
     "write": "write",
-    "edit/:id": "edit"
+    "edit/:id": "edit",
 
-    //"*notFound": "notFound"
+    "*notFound": "notFound"
   },
 
-  /*
+  publicMethod: [
+    "index",
+    "news",
+    "login",
+  ],
+
   execute: function(callback, args, name) {
-    if (!sessionModel.loggedIn()) {
+    if (this.publicMethod.indexOf(name) === -1 && !sessionModel.loggedIn()) {
       this.navigate('', {trigger: true});
       return false;
     }
     if (callback) callback.apply(this, args);
   },
-  */
 
   index: function() {
     var IndexView = require("./views/index");
@@ -86,16 +90,11 @@ var Router = Backbone.Router.extend({
       newsid: newsid,
       router: this
     });
-  }
+  },
 
-  /*
   notFound: function() {
-    var notFoundView = require("./views/notFoundView");
-    new notFoundView({
-      el: $('#main')
-    });
+    window.location.href = '';
   }
-  */
 });
 
 $(function() {
