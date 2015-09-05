@@ -16,11 +16,11 @@ var NavView = Backbone.View.extend({
         name: "首页",
         url: "/"
       },
-      //{
-      //  id: "course",
-      //  name: "课程",
-      //  url: "/course"
-      //},
+      {
+        id: "course",
+        name: "课程",
+        url: "/course"
+      },
       //{
       //  id: "signup",
       //  name: "注册",
@@ -38,11 +38,11 @@ var NavView = Backbone.View.extend({
         name: "首页",
         url: "/"
       },
-      //{
-      //  id: "course",
-      //  name: "课程",
-      //  url: "/course"
-      //},
+      {
+        id: "course",
+        name: "课程",
+        url: "/course"
+      },
       {
         id: "write",
         name: "撰写公告",
