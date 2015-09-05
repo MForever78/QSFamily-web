@@ -2157,18 +2157,50 @@ module.exports = Sha512
 
 }).call(this,require("buffer").Buffer)
 },{"./hash":4,"buffer":1,"inherits":6}],13:[function(require,module,exports){
+var courseModel = require("../models/course");
+
+var courseCollection = Backbone.Collection.extend({
+  url: function() {
+    return window.baseURL + '/course';
+  },
+
+  parse: function(response) {
+    if (response.code === 200) {
+      return response.courseList;
+    }
+  },
+
+  model: courseModel
+});
+
+module.exports = courseCollection;
+
+},{"../models/course":15}],14:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/3.
  */
 
+window.baseURL = "http://qsfamily.mforever78.com:3000";
+
 var SessionModel = require('./models/session');
 var sessionModel = new SessionModel({
-  baseURL: 'http://qsfamily.mforever78.com:3000/',
   salt: '123456'
 });
 
 var NewsModel = require('./models/news');
 var newsModel = new NewsModel({ sessionModel: sessionModel });
+
+Backbone.ajax = function(request) {
+  // Add auth header if user has logged in
+  if (sessionModel.loggedIn()) {
+    return $.ajax(_.extend(request, {
+      headers: {
+        Authorization: "Bearer " + sessionModel.get("token")
+      }
+    }));
+  }
+  return $.ajax(request);
+};
 
 var Router = Backbone.Router.extend({
   routes: {
@@ -2178,6 +2210,8 @@ var Router = Backbone.Router.extend({
     "logout": "logout",
     "write": "write",
     "edit/:id": "edit",
+    "course": "courseList",
+    "course/:id": "course",
 
     "*notFound": "notFound"
   },
@@ -2185,7 +2219,7 @@ var Router = Backbone.Router.extend({
   publicMethod: [
     "index",
     "news",
-    "login",
+    "login"
   ],
 
   execute: function(callback, args, name) {
@@ -2251,6 +2285,15 @@ var Router = Backbone.Router.extend({
     });
   },
 
+  courseList: function() {
+    var CourseListView = require('./views/course-list.js');
+    new CourseListView({
+      el: $('#main'),
+      sessionModel: sessionModel,
+      router: this
+    });
+  },
+
   notFound: function() {
     window.location.href = '';
   }
@@ -2266,7 +2309,14 @@ $(function() {
   });
 });
 
-},{"./models/news":14,"./models/session":15,"./views/edit":16,"./views/index":17,"./views/login":18,"./views/news":21,"./views/write":22}],14:[function(require,module,exports){
+},{"./models/news":16,"./models/session":17,"./views/course-list.js":18,"./views/edit":19,"./views/index":20,"./views/login":21,"./views/news":24,"./views/write":25}],15:[function(require,module,exports){
+var courseModel = Backbone.Model.extend({
+  
+});
+
+module.exports = courseModel;
+
+},{}],16:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/7.
  */
@@ -2279,7 +2329,7 @@ var NewsModel = Backbone.Model.extend({
   getNewsList: function() {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news', {
+      self.sessionModel.ajax('/news', {
         method: 'GET'
       }).then(function(newsList) {
         resolve(newsList.news);
@@ -2290,7 +2340,7 @@ var NewsModel = Backbone.Model.extend({
   getNewsById: function(id) {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news/' + id, {
+      self.sessionModel.ajax('/news/' + id, {
         method: 'GET',
         data: {
           token: self.sessionModel.token
@@ -2304,7 +2354,7 @@ var NewsModel = Backbone.Model.extend({
   postNews: function(title, content) {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news/post', {
+      self.sessionModel.ajax('/news/post', {
         method: 'POST',
         data: JSON.stringify({
           token: self.sessionModel.token,
@@ -2321,14 +2371,14 @@ var NewsModel = Backbone.Model.extend({
   editNews: function(id, title, content) {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news/edit', {
+      self.sessionModel.ajax('/news/edit', {
         method: 'POST',
-        data: JSON.stringify({
+        data: {
           token: self.sessionModel.token,
           newsid: id,
           title: title,
           content: content
-        }),
+        },
         contentType: 'application/json'
       }).then(function() {
         resolve(null);
@@ -2339,7 +2389,7 @@ var NewsModel = Backbone.Model.extend({
   deleteNews: function(id) {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news/delete', {
+      self.sessionModel.ajax('/news/delete', {
         method: 'POST',
         data: JSON.stringify({
           token: self.sessionModel.token,
@@ -2355,7 +2405,7 @@ var NewsModel = Backbone.Model.extend({
   updateNews: function(id, news) {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news/update', {
+      self.sessionModel.ajax('/news/update', {
         method: 'POST',
         data: JSON.stringify({
           token: self.sessionModel.token,
@@ -2372,7 +2422,7 @@ var NewsModel = Backbone.Model.extend({
 
 module.exports = NewsModel;
 
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/6.
  */
@@ -2411,21 +2461,20 @@ var SessionModel = Backbone.Model.extend({
   },
 
   initialize: function(opt) {
-    this.baseURL = opt.baseURL;
+    this.baseURL = window.baseURL;
     this.salt = opt.salt;
     this.token = localStorage.getItem("QSFamily-token");
-    this.userid = localStorage.getItem("QSFamily-user-id");
   },
 
   loggedIn: function() {
-    return this.token && this.userid;
+    return this.token;
   },
 
   login: function(role, username, password) {
     var self = this;
     return new Promise(function(resolve, reject) {
       var sha256 = createHash('sha256');
-      self.ajax("login", {
+      self.ajax("/login", {
         data: JSON.stringify({
           role: role,
           username: username,
@@ -2435,7 +2484,6 @@ var SessionModel = Backbone.Model.extend({
         contentType: 'application/json'
       }).then(function(result) {
         self.token = result.token;
-        self.userid = result.userid;
         self.saveStorage();
         resolve(null);
       }).catch(function(err) {
@@ -2446,18 +2494,47 @@ var SessionModel = Backbone.Model.extend({
 
   logout: function() {
     localStorage.removeItem('QSFamily-token');
-    localStorage.removeItem('QSFamily-user-id');
   },
 
   saveStorage: function() {
     localStorage.setItem('QSFamily-token', this.token);
-    localStorage.setItem('QSFamily-user-id', this.userid);
   }
 });
 
 module.exports = SessionModel;
 
-},{"../views/message":19,"sha.js":5}],16:[function(require,module,exports){
+},{"../views/message":22,"sha.js":5}],18:[function(require,module,exports){
+var courseCollection = require('../collections/course-list');
+var NavView = require('./nav');
+
+var CourseListView = Backbone.View.extend({
+  initialize: function(opt) {
+    this.courseList = new courseCollection();
+    this.sessionModel = opt.sessionModel;
+    this.render();
+  },
+
+  render: function() {
+    this.courseList.fetch({
+      success: function(data) {
+        console.log(data);
+      }
+    });
+    var navView = NavView.instance || new NavView({
+      sessionModel: this.sessionModel
+    });
+    navView.render({
+      id: 'course'
+    });
+    //var template = _.template($("#coursseList-template").html());
+    //this.$el.html(template());
+  }
+});
+
+module.exports = CourseListView;
+
+
+},{"../collections/course-list":13,"./nav":23}],19:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/12.
  */
@@ -2532,7 +2609,7 @@ var EditView = Backbone.View.extend({
 
 module.exports = EditView;
 
-},{"./message":19,"./nav":20}],17:[function(require,module,exports){
+},{"./message":22,"./nav":23}],20:[function(require,module,exports){
 var NavView = require("./nav");
 
 var IndexView = Backbone.View.extend({
@@ -2563,7 +2640,7 @@ var IndexView = Backbone.View.extend({
 
 module.exports = IndexView;
 
-},{"./nav":20}],18:[function(require,module,exports){
+},{"./nav":23}],21:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/8.
  */
@@ -2626,7 +2703,7 @@ var LoginView = Backbone.View.extend({
 
 module.exports = LoginView;
 
-},{"./message":19,"./nav":20}],19:[function(require,module,exports){
+},{"./message":22,"./nav":23}],22:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/9.
  */
@@ -2657,7 +2734,7 @@ var MessageView = Backbone.View.extend({
 
 module.exports = MessageView;
 
-},{}],20:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/10.
  */
@@ -2676,11 +2753,11 @@ var NavView = Backbone.View.extend({
         name: "首页",
         url: "/"
       },
-      //{
-      //  id: "course",
-      //  name: "课程",
-      //  url: "/course"
-      //},
+      {
+        id: "course",
+        name: "课程",
+        url: "/course"
+      },
       //{
       //  id: "signup",
       //  name: "注册",
@@ -2698,11 +2775,11 @@ var NavView = Backbone.View.extend({
         name: "首页",
         url: "/"
       },
-      //{
-      //  id: "course",
-      //  name: "课程",
-      //  url: "/course"
-      //},
+      {
+        id: "course",
+        name: "课程",
+        url: "/course"
+      },
       {
         id: "write",
         name: "撰写公告",
@@ -2732,7 +2809,7 @@ var NavView = Backbone.View.extend({
 
 module.exports = NavView;
 
-},{}],21:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/11.
  */
@@ -2800,7 +2877,7 @@ var NewsView = Backbone.View.extend({
 
 module.exports = NewsView;
 
-},{"./message":19,"./nav":20}],22:[function(require,module,exports){
+},{"./message":22,"./nav":23}],25:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/9.
  */
@@ -2849,4 +2926,4 @@ var WriteView = Backbone.View.extend({
 
 module.exports = WriteView;
 
-},{"./nav":20}]},{},[13])
+},{"./nav":23}]},{},[14])
