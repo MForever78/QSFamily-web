@@ -2,14 +2,27 @@
  * Created by MForever78 on 15/6/3.
  */
 
+window.baseURL = "http://qsfamily.mforever78.com:3000";
+
 var SessionModel = require('./models/session');
 var sessionModel = new SessionModel({
-  baseURL: 'http://qsfamily.mforever78.com:3000/',
   salt: '123456'
 });
 
 var NewsModel = require('./models/news');
 var newsModel = new NewsModel({ sessionModel: sessionModel });
+
+Backbone.ajax = function(request) {
+  // Add auth header if user has logged in
+  if (sessionModel.loggedIn()) {
+    return $.ajax(_.extend(request, {
+      headers: {
+        Authorization: "Bearer " + sessionModel.get("token")
+      }
+    }));
+  }
+  return $.ajax(request);
+};
 
 var Router = Backbone.Router.extend({
   routes: {
@@ -19,6 +32,8 @@ var Router = Backbone.Router.extend({
     "logout": "logout",
     "write": "write",
     "edit/:id": "edit",
+    "course": "courseList",
+    "course/:id": "course",
 
     "*notFound": "notFound"
   },
@@ -26,7 +41,7 @@ var Router = Backbone.Router.extend({
   publicMethod: [
     "index",
     "news",
-    "login",
+    "login"
   ],
 
   execute: function(callback, args, name) {
@@ -88,6 +103,15 @@ var Router = Backbone.Router.extend({
       sessionModel: sessionModel,
       newsModel: newsModel,
       newsid: newsid,
+      router: this
+    });
+  },
+
+  courseList: function() {
+    var CourseListView = require('./views/course-list.js');
+    new CourseListView({
+      el: $('#main'),
+      sessionModel: sessionModel,
       router: this
     });
   },
