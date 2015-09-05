@@ -36,21 +36,20 @@ var SessionModel = Backbone.Model.extend({
   },
 
   initialize: function(opt) {
-    this.baseURL = opt.baseURL;
+    this.baseURL = window.baseURL;
     this.salt = opt.salt;
     this.token = localStorage.getItem("QSFamily-token");
-    this.userid = localStorage.getItem("QSFamily-user-id");
   },
 
   loggedIn: function() {
-    return this.token && this.userid;
+    return this.token;
   },
 
   login: function(role, username, password) {
     var self = this;
     return new Promise(function(resolve, reject) {
       var sha256 = createHash('sha256');
-      self.ajax("login", {
+      self.ajax("/login", {
         data: JSON.stringify({
           role: role,
           username: username,
@@ -60,7 +59,6 @@ var SessionModel = Backbone.Model.extend({
         contentType: 'application/json'
       }).then(function(result) {
         self.token = result.token;
-        self.userid = result.userid;
         self.saveStorage();
         resolve(null);
       }).catch(function(err) {
@@ -71,12 +69,10 @@ var SessionModel = Backbone.Model.extend({
 
   logout: function() {
     localStorage.removeItem('QSFamily-token');
-    localStorage.removeItem('QSFamily-user-id');
   },
 
   saveStorage: function() {
     localStorage.setItem('QSFamily-token', this.token);
-    localStorage.setItem('QSFamily-user-id', this.userid);
   }
 });
 

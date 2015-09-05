@@ -10,7 +10,7 @@ var NewsModel = Backbone.Model.extend({
   getNewsList: function() {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news', {
+      self.sessionModel.ajax('/news', {
         method: 'GET'
       }).then(function(newsList) {
         resolve(newsList.news);
@@ -21,7 +21,7 @@ var NewsModel = Backbone.Model.extend({
   getNewsById: function(id) {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news/' + id, {
+      self.sessionModel.ajax('/news/' + id, {
         method: 'GET',
         data: {
           token: self.sessionModel.token
@@ -35,7 +35,7 @@ var NewsModel = Backbone.Model.extend({
   postNews: function(title, content) {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news/post', {
+      self.sessionModel.ajax('/news/post', {
         method: 'POST',
         data: JSON.stringify({
           token: self.sessionModel.token,
@@ -52,14 +52,14 @@ var NewsModel = Backbone.Model.extend({
   editNews: function(id, title, content) {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news/edit', {
+      self.sessionModel.ajax('/news/edit', {
         method: 'POST',
-        data: JSON.stringify({
+        data: {
           token: self.sessionModel.token,
           newsid: id,
           title: title,
           content: content
-        }),
+        },
         contentType: 'application/json'
       }).then(function() {
         resolve(null);
@@ -70,7 +70,7 @@ var NewsModel = Backbone.Model.extend({
   deleteNews: function(id) {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news/delete', {
+      self.sessionModel.ajax('/news/delete', {
         method: 'POST',
         data: JSON.stringify({
           token: self.sessionModel.token,
@@ -86,7 +86,7 @@ var NewsModel = Backbone.Model.extend({
   updateNews: function(id, news) {
     var self = this;
     return new Promise(function(resolve) {
-      self.sessionModel.ajax('news/update', {
+      self.sessionModel.ajax('/news/update', {
         method: 'POST',
         data: JSON.stringify({
           token: self.sessionModel.token,
