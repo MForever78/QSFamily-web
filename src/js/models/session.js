@@ -39,6 +39,7 @@ var SessionModel = Backbone.Model.extend({
     this.baseURL = window.baseURL;
     this.salt = opt.salt;
     this.token = localStorage.getItem("QSFamily-token");
+    this.profile = JSON.parse(localStorage.getItem("QSFamily-profile"));
   },
 
   loggedIn: function() {
@@ -59,6 +60,7 @@ var SessionModel = Backbone.Model.extend({
         contentType: 'application/json'
       }).then(function(result) {
         self.token = result.token;
+        self.profile = result.profile;
         self.saveStorage();
         resolve(null);
       }).catch(function(err) {
@@ -69,10 +71,12 @@ var SessionModel = Backbone.Model.extend({
 
   logout: function() {
     localStorage.removeItem('QSFamily-token');
+    localStorage.removeItem('QSFamily-profile');
   },
 
   saveStorage: function() {
     localStorage.setItem('QSFamily-token', this.token);
+    localStorage.setItem('QSFamily-profile', JSON.stringify(this.profile));
   }
 });
 

@@ -31,7 +31,7 @@ var NewsView = Backbone.View.extend({
     this.newsModel.getNewsById(this.newsid)
       .then(function(data) {
         data.news.date = new Date(data.news.create_at);
-        var editable = data.role === 'teacher';
+        var editable = self.sessionModel.profile.role === 'teacher';
         self.$el.html(template({
           editable: editable,
           news: data.news
