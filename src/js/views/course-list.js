@@ -11,13 +11,17 @@ var CourseListView = Backbone.View.extend({
   events: {
     "click .course-tab": function(e) {
       e.preventDefault();
+      // active tab
       var tab = $(e.currentTarget);
       tab.addClass("active");
       tab.siblings().removeClass("active");
+      // active tab content
       var content = $(e.target.attributes.href.value);
-      console.log(e.target.attributes);
-      content.addClass("active");
-      content.siblings().removeClass("active");
+      content.siblings().removeClass("in");
+      setTimeout(function() {
+        content.siblings().removeClass("active");
+        content.addClass("active in");
+      }, 200);
     }
   },
 
@@ -27,6 +31,8 @@ var CourseListView = Backbone.View.extend({
       success: function(courseList) {
         var template = _.template($("#course-list-template").html());
         self.$el.html(template({courseList: courseList}));
+        // active first tab
+        $(".course-tab a").first().click();
       }
     });
     var navView = NavView.instance || new NavView({
