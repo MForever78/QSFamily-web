@@ -10,14 +10,13 @@ var sessionModel = new SessionModel({
 });
 
 var NewsModel = require('./models/news');
-var newsModel = new NewsModel({ sessionModel: sessionModel });
 
 Backbone.ajax = function(request) {
   // Add auth header if user has logged in
   if (sessionModel.loggedIn()) {
     return $.ajax(_.extend(request, {
       headers: {
-        Authorization: "Bearer " + sessionModel.get("token")
+        Authorization: "Bearer " + sessionModel.token
       }
     }));
   }
@@ -56,8 +55,7 @@ var Router = Backbone.Router.extend({
     var IndexView = require("./views/index");
     new IndexView({
       el: $('#main'),
-      sessionModel: sessionModel,
-      newsModel: newsModel
+      sessionModel: sessionModel
     });
   },
 
@@ -66,8 +64,7 @@ var Router = Backbone.Router.extend({
     new NewsView({
       el: $("#main"),
       sessionModel: sessionModel,
-      newsModel: newsModel,
-      newsid: newsid,
+      newsModel: new NewsModel({id: newsid}),
       router: this
     });
   },
@@ -91,7 +88,6 @@ var Router = Backbone.Router.extend({
     new WriteView({
       el: $('#main'),
       sessionModel: sessionModel,
-      newsModel: newsModel,
       router: this
     });
   },
@@ -101,8 +97,7 @@ var Router = Backbone.Router.extend({
     new EditView({
       el: $('#main'),
       sessionModel: sessionModel,
-      newsModel: newsModel,
-      newsid: newsid,
+      itemModel: new NewsModel({id: newsid}),
       router: this
     });
   },

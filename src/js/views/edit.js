@@ -7,10 +7,9 @@ var NavView = require("./nav");
 
 var EditView = Backbone.View.extend({
   initialize: function(opt) {
-    this.newsModel = opt.newsModel;
+    this.itemModel = opt.itemModel;
     this.sessionModel = opt.sessionModel;
     this.router = opt.router;
-    this.newsid = opt.newsid;
     this.render();
   },
 
@@ -30,43 +29,39 @@ var EditView = Backbone.View.extend({
     var self = this;
     $.getScript("/static/lib/simditor.min.js")
       .done(function() {
-        console.log("succeed");
         self.editor = new Simditor({
           textarea: $("#news-content")
         });
-        self.newsModel.getNewsById(self.newsid)
-          .then(function(data) {
-            $("#news-title").val(data.news.title);
-            self.editor.setValue(data.news.content);
-          });
+        self.itemModel.fetch({success: function(data) {
+          $("#news-title").val(data.get('title'));
+          self.editor.setValue(data.get('content'));
+        }});
       })
       .fail(function() {
-        console.log("failed");
-        alert(arguments[2].toString());
+        console.log("simditor load failed");
       });
   },
 
   update: function() {
-    var news = {
+    var data = {
       title: $("#news-title").val(),
       content: this.editor.getValue()
     };
     var self = this;
-    this.newsModel.updateNews(this.newsid, news)
-      .then(function() {
-        var messageView = MessageView.instance || new MessageView({
+    this.itemModel.save(data, {success: function() {
+      var messageView = MessageView.instance || new MessageView({
           sessionModel: this.sessionModel
         });
-        messageView.display({
-          type: 'success',
-          parent: $("#write-wrap"),
-          message: "更新成功",
-          icon: "checkmark"
-        });
-        setTimeout(function() {
-          self.router.navigate("news/" + self.newsid, { trigger: true })
-        }, 600);
+      messageView.display({
+        type: 'success',
+        parent: $("#write-wrap"),
+        message: "更新成功",
+        icon: "checkmark"
       });
+      setTimeout(function() {
+        self.router.navigate("news/" + self.itemModel.id, { trigger: true })
+      }, 600);
+    }});
   }
 });
 
