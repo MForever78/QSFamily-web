@@ -7,7 +7,7 @@ var NavView = require('./nav');
 var WriteView = Backbone.View.extend({
   initialize: function(opt) {
     this.sessionModel = opt.sessionModel;
-    this.newsModel = opt.newsModel;
+    this.itemModel = opt.itemModel;
     this.router = opt.router;
     this.render();
   },
@@ -33,12 +33,14 @@ var WriteView = Backbone.View.extend({
     "click #news-submit": function(event) {
       event.preventDefault();
       var self = this;
-      var title = $("#news-title").val();
-      var content = this.editor.getValue();
-      this.newsModel.postNews(title, content).then(function() {
-        self.router.navigate('', { trigger: true });
-      }).catch(function(err) {
-        console.log("Post failed");
+      var data = {
+        title  : $("#news-title").val(),
+        content: this.editor.getValue()
+      };
+      this.itemModel.save(data, {
+        success: function () {
+          self.router.navigate('', { trigger: true });
+        }
       });
     }
   }

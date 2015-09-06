@@ -88,6 +88,7 @@ var Router = Backbone.Router.extend({
     new WriteView({
       el: $('#main'),
       sessionModel: sessionModel,
+      itemModel: new NewsModel,
       router: this
     });
   },
@@ -118,7 +119,7 @@ var Router = Backbone.Router.extend({
 
 $(function() {
   var router = new Router();
-  
+
   Backbone.history.start({
     pushState: true,
     hashChange: false,
