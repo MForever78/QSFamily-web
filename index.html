@@ -58,7 +58,7 @@
         </ul>
     </script>
     <script type="text/template" id="index-template">
-        <div id="post-wrap">
+        <div class="post-wrap">
             <% _.each(newsList, function(news) { %>
             <article>
                 <div class="post-title"><a href="/news/<%= news.id %>"><%= news.title %></a></div>
@@ -126,7 +126,7 @@
         </div>
     </script>
     <script type="text/template" id="news-template">
-        <div id="post-wrap">
+        <div class="post-wrap">
             <article>
                 <div class="post-title"><%= news.title %></div>
                 <div class="post-meta">
@@ -141,6 +141,24 @@
                 </div>
                 <div class="post-content"><%= news.content %></div>
             </article>
+        </div>
+    </script>
+    <script type="text/template" id="course-list-template">
+        <div id="course-list-wrap">
+            <ul class="course-list">
+                <% courseList.each(function(course) { %>
+                <li class="course-tab">
+                    <a href="#course-<%= course.get('id') %>"><%= course.get('course_name') %></a>
+                </li>
+                <% }); %>
+            </ul>
+            <div class="course-desc">
+                <% courseList.each(function(course) { %>
+                <div class="course-content" id="course-<%= course.get('id') %>">
+                    <%= course.get('description') %>
+                </div>
+                <% }); %>
+            </div>
         </div>
     </script>
 </body>
