@@ -17,6 +17,7 @@ var CourseListView = Backbone.View.extend({
       tab.siblings().removeClass("active");
       // active tab content
       var content = $(e.target.attributes.href.value);
+      // remove in first to let animation work
       content.siblings().removeClass("in");
       setTimeout(function() {
         content.siblings().removeClass("active");
