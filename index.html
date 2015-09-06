@@ -128,10 +128,10 @@
     <script type="text/template" id="news-template">
         <div class="post-wrap">
             <article>
-                <div class="post-title"><%= news.title %></div>
+                <div class="post-title"><%= news.get('title') %></div>
                 <div class="post-meta">
-                    <span class="post-date"><%= news.date.getFullYear() %> 年 <%= news.date.getMonth() + 1 %> 月 <%= news.date.getDate() %> 日</span>
-                    <span class="post-author"><%= news.author %></span>
+                    <span class="post-date"><%= news.get('date').getFullYear() %> 年 <%= news.get('date').getMonth() + 1 %> 月 <%= news.get('date').getDate() %> 日</span>
+                    <span class="post-author"><%= news.get('author') %></span>
                     <% if (editable) { %>
                     <div class="post-edit">
                         <span id="edit" data-newsid="<%= news.id %>"><a href="javascript:void(0)">编辑</a></span>
@@ -139,7 +139,7 @@
                     </div>
                     <% } %>
                 </div>
-                <div class="post-content"><%= news.content %></div>
+                <div class="post-content"><%= news.get('content') %></div>
             </article>
         </div>
     </script>
