@@ -1,9 +1,10 @@
 var NavView = require("./nav");
+var NewsList = require("../collections/news-list");
 
 var IndexView = Backbone.View.extend({
   initialize: function(opt) {
     this.sessionModel = opt.sessionModel;
-    this.newsModel = opt.newsModel;
+    this.newsList = NewsList.instance || new NewsList;
     this.render();
   },
 
@@ -15,14 +16,10 @@ var IndexView = Backbone.View.extend({
       id: 'index'
     });
     var self = this;
-    this.newsModel.getNewsList().then(function(result) {
-      var template = _.template($('#index-template').html());
-      var newsList = result.map(function(news) {
-        news.date = new Date(news.create_at);
-        return news;
-      });
+    var template = _.template($('#index-template').html());
+    this.newsList.fetch({success: function(newsList) {
       self.$el.html(template({ newsList: newsList })).hide().fadeIn(300);
-    });
+    }});
   }
 });
 

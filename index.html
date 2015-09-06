@@ -59,14 +59,14 @@
     </script>
     <script type="text/template" id="index-template">
         <div class="post-wrap">
-            <% _.each(newsList, function(news) { %>
+            <% newsList.each(function(news) { %>
             <article>
-                <div class="post-title"><a href="/news/<%= news.id %>"><%= news.title %></a></div>
+                <div class="post-title"><a href="/news/<%= news.get('id') %>"><%= news.get('title') %></a></div>
                 <div class="post-meta">
-                    <span class="post-date"><%= news.date.getFullYear() %> 年 <%= news.date.getMonth() + 1 %> 月 <%= news.date.getDate() %> 日</span>
-                    <span class="post-author"><%= news.author %></span>
+                    <span class="post-date"><%= news.get('date').getFullYear() %> 年 <%= news.get('date').getMonth() + 1 %> 月 <%= news.get('date').getDate() %> 日</span>
+                    <span class="post-author"><%= news.get('author') %></span>
                 </div>
-                <div class="post-content"><%= news.content %></div>
+                <div class="post-content"><%= news.get('content') %></div>
             </article>
             <% }); %>
         </div>
