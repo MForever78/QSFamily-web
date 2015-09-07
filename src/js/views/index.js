@@ -1,4 +1,3 @@
-var NavView = require("./nav");
 var NewsList = require("../collections/news-list");
 
 var IndexView = Backbone.View.extend({
@@ -9,12 +8,6 @@ var IndexView = Backbone.View.extend({
   },
 
   render: function() {
-    var navView = NavView.instance || new NavView({
-        sessionModel: this.sessionModel
-    });
-    navView.render({
-      id: 'index'
-    });
     var self = this;
     var template = _.template($('#index-template').html());
     this.newsList.fetch({success: function(newsList) {

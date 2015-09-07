@@ -57,6 +57,7 @@ var NavView = Backbone.View.extend({
   },
 
   render: function(opt) {
+    this.$el = $("#navbar");
     var template = _.template($('#nav-template').html());
     if (this.sessionModel.loggedIn()) {
       this.$el.html(template({ navList: this.navList.teacher }));

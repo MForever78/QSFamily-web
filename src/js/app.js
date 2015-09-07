@@ -12,6 +12,11 @@ var sessionModel = new SessionModel({
 var NewsModel = require('./models/news');
 var MessageView = require('./views/message');
 
+var NavView = require('./views/nav');
+var navView = new NavView({
+  sessionModel: sessionModel
+});
+
 Backbone.ajax = function(request) {
   // Add auth header if user has logged in
   if (sessionModel.loggedIn()) {
@@ -58,14 +63,20 @@ var Router = Backbone.Router.extend({
       el: $('#main'),
       sessionModel: sessionModel
     });
+    navView.render({
+      id: 'index'
+    });
   },
 
   news: function(newsid) {
+    navView.render({
+      id: 'index'
+    });
     var NewsView = require("./views/news");
     new NewsView({
       el: $("#main"),
       sessionModel: sessionModel,
-      newsModel: new NewsModel({id: newsid}),
+      model: new NewsModel({id: newsid}),
       router: this
     });
   },

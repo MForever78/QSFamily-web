@@ -3,13 +3,11 @@
  */
 
 var MessageView = require("./message");
-var NavView = require("./nav");
 
 var NewsView = Backbone.View.extend({
   initialize: function(opt) {
     this.sessionModel = opt.sessionModel;
     this.router = opt.router;
-    this.newsModel = opt.newsModel;
     this.render();
   },
 
@@ -19,15 +17,9 @@ var NewsView = Backbone.View.extend({
   },
 
   render: function() {
-    var navView = NavView.instance || new NavView({
-      sessionModel: this.sessionModel
-    });
-    navView.render({
-      id: 'index'
-    });
     var template = _.template($("#news-template").html());
     var self = this;
-    this.newsModel.fetch({success: function(news) {
+    this.model.fetch({success: function(news) {
       var editable = self.sessionModel.profile.role === 'teacher';
       self.$el.html(template({
         editable: editable,
@@ -38,13 +30,13 @@ var NewsView = Backbone.View.extend({
 
   editNews: function(event) {
     event.preventDefault();
-    this.router.navigate("edit/" + this.newsModel.id, { trigger: true });
+    this.router.navigate("edit/" + this.model.id, { trigger: true });
   },
 
   deleteNews: function(event) {
     event.preventDefault();
     var self = this;
-    this.newsModel.destroy({success: function() {
+    this.model.destroy({success: function() {
       var messageView = MessageView.instance || new MessageView;
       messageView.display({
         type: 'success',
