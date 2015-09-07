@@ -58,13 +58,13 @@ var Router = Backbone.Router.extend({
   },
 
   index: function() {
+    navView.render({
+      id: 'index'
+    });
     var IndexView = require("./views/index");
     new IndexView({
       el: $('#main'),
       sessionModel: sessionModel
-    });
-    navView.render({
-      id: 'index'
     });
   },
 
@@ -82,6 +82,9 @@ var Router = Backbone.Router.extend({
   },
 
   login: function() {
+    navView.render({
+      id: "login"
+    });
     var LoginView = require("./views/login");
     new LoginView({
       el: $('#main'),
@@ -96,6 +99,9 @@ var Router = Backbone.Router.extend({
   },
 
   write: function() {
+    navView.render({
+      id: "write"
+    });
     var self = this;
     var EditorView = require('./views/editor');
     new EditorView({
@@ -119,6 +125,9 @@ var Router = Backbone.Router.extend({
   },
 
   edit: function(newsid) {
+    navView.render({
+      id: "index"
+    });
     var self = this;
     var EditorView = require('./views/editor');
     new EditorView({
@@ -142,6 +151,9 @@ var Router = Backbone.Router.extend({
   },
 
   courseList: function() {
+    navView.render({
+      id: "course"
+    });
     var CourseListView = require('./views/course-list.js');
     new CourseListView({
       el: $('#main'),

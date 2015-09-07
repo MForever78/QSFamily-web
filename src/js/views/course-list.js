@@ -1,5 +1,4 @@
 var courseCollection = require('../collections/course-list');
-var NavView = require('./nav');
 
 var CourseListView = Backbone.View.extend({
   initialize: function(opt) {
@@ -35,12 +34,6 @@ var CourseListView = Backbone.View.extend({
         // active first tab
         $(".course-tab a").first().click();
       }
-    });
-    var navView = NavView.instance || new NavView({
-      sessionModel: this.sessionModel
-    });
-    navView.render({
-      id: 'course'
     });
   }
 });

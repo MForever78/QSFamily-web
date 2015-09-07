@@ -3,7 +3,6 @@
  */
 
 var MessageView = require('./message');
-var NavView = require('./nav');
 
 var LoginView = Backbone.View.extend({
   initialize: function(opt) {
@@ -13,12 +12,6 @@ var LoginView = Backbone.View.extend({
   },
 
   render: function() {
-    var navView = NavView.instance || new NavView({
-      sessionModel: this.sessionModel
-    });
-    navView.render({
-      id: 'login'
-    });
     var template = _.template($("#login-template").html());
     this.$el.html(template({}));
   },
