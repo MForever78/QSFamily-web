@@ -151,10 +151,25 @@
                     <a href="#course-<%= course.get('id') %>"><%= course.get('course_name') %></a>
                 </li>
                 <% }); %>
+                <% if (editable) { %>
+                <div class="course-add">
+                    <i class="icon plus"></i> <a href="javascript:void(0)" data-action="new">增加课程</a>
+                </div>
+                <% } %>
             </ul>
             <div class="course-desc">
                 <% courseList.each(function(course) { %>
                 <div class="course-content fade" id="course-<%= course.get('id') %>">
+                    <% if (editable) { %>
+                    <ul class="course-edit">
+                        <li class="course-edit-item">
+                            <i class="icon edit"></i> <a href="javascript:void(0)" data-id="<%= course.get('id') %>" data-action="edit">编辑</a>
+                        </li>
+                        <li class="course-edit-item">
+                            <i class="icon trash"></i> <a href="javascript:void(0)" data-id="<%= course.get('id') %>" data-action="delete">删除</a>
+                        </li>
+                    </ul>
+                    <% } %>
                     <%= course.get('description') %>
                 </div>
                 <% }); %>
