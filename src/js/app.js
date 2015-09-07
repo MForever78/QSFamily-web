@@ -10,6 +10,7 @@ var sessionModel = new SessionModel({
 });
 
 var NewsModel = require('./models/news');
+var CourseModel = require('./models/course');
 var MessageView = require('./views/message');
 
 var NavView = require('./views/nav');
@@ -35,10 +36,12 @@ var Router = Backbone.Router.extend({
     "news/:id": "news",
     "login": "login",
     "logout": "logout",
-    "write": "write",
-    "edit/:id": "edit",
+    "write/news": "writeNews",
+    "edit/news/:id": "editNews",
     "course": "courseList",
     "course/:id": "course",
+    "write/course": "writeCourse",
+    "edit/course/:id": "editCourse",
 
     "*notFound": "notFound"
   },
@@ -98,7 +101,7 @@ var Router = Backbone.Router.extend({
     window.location.href = '';
   },
 
-  write: function() {
+  writeNews: function() {
     navView.render({
       id: "write"
     });
@@ -107,6 +110,8 @@ var Router = Backbone.Router.extend({
     new EditorView({
       el: $('#main'),
       model: new NewsModel,
+      title: "title",
+      content: "content",
       success: function() {
         var messageView = MessageView.instance || new MessageView({
             sessionModel: sessionModel
@@ -124,7 +129,7 @@ var Router = Backbone.Router.extend({
     });
   },
 
-  edit: function(newsid) {
+  editNews: function(newsid) {
     navView.render({
       id: "index"
     });
@@ -133,6 +138,8 @@ var Router = Backbone.Router.extend({
     new EditorView({
       el: $('#main'),
       model: new NewsModel({id: newsid}),
+      title: "title",
+      content: "content",
       success: function() {
         var messageView = MessageView.instance || new MessageView({
             sessionModel: sessionModel
@@ -145,6 +152,62 @@ var Router = Backbone.Router.extend({
         });
         setTimeout(function() {
           self.navigate("/news/" + newsid, { trigger: true });
+        }, 600);
+      }
+    });
+  },
+
+  writeCourse: function() {
+    navView.render({
+      id: "index"
+    });
+    var self = this;
+    var EditorView = require('./views/editor');
+    new EditorView({
+      el: $('#main'),
+      model: new CourseModel,
+      title: "course_name",
+      content: "description",
+      success: function() {
+        var messageView = MessageView.instance || new MessageView({
+            sessionModel: sessionModel
+          });
+        messageView.display({
+          type: 'success',
+          parent: $("#write-wrap"),
+          message: "新建成功",
+          icon: "checkmark"
+        });
+        setTimeout(function() {
+          self.navigate("/course", { trigger: true });
+        }, 600);
+      }
+    });
+  },
+
+  editCourse: function(courseId) {
+    navView.render({
+      id: "index"
+    });
+    var self = this;
+    var EditorView = require('./views/editor');
+    new EditorView({
+      el: $('#main'),
+      title: "course_name",
+      content: "description",
+      model: new CourseModel({id: courseId}),
+      success: function() {
+        var messageView = MessageView.instance || new MessageView({
+            sessionModel: sessionModel
+          });
+        messageView.display({
+          type: 'success',
+          parent: $("#write-wrap"),
+          message: "更新成功",
+          icon: "checkmark"
+        });
+        setTimeout(function() {
+          self.navigate("/course", { trigger: true });
         }, 600);
       }
     });

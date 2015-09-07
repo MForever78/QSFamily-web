@@ -30,7 +30,7 @@ var NewsView = Backbone.View.extend({
 
   editNews: function(event) {
     event.preventDefault();
-    this.router.navigate("edit/" + this.model.id, { trigger: true });
+    this.router.navigate("edit/news/" + this.model.id, { trigger: true });
   },
 
   deleteNews: function(event) {

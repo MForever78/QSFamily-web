@@ -46,7 +46,7 @@ var NavView = Backbone.View.extend({
       {
         id: "write",
         name: "撰写公告",
-        url: "/write"
+        url: "/write/news"
       },
       {
         id: "logout",

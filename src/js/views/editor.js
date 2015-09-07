@@ -6,6 +6,8 @@ var EditorView = Backbone.View.extend({
   initialize: function(opt) {
     this.success = opt.success;
     this.error = opt.error;
+    this.title = opt.title;
+    this.content = opt.content;
     this.render();
   },
 
@@ -24,8 +26,8 @@ var EditorView = Backbone.View.extend({
         });
         if (!self.model.isNew()) {
           self.model.fetch({success: function(data) {
-            $("#news-title").val(data.get('title'));
-            self.editor.setValue(data.get('content'));
+            $("#news-title").val(data.get(self.title));
+            self.editor.setValue(data.get(self.content));
           }});
         }
       })
@@ -35,10 +37,9 @@ var EditorView = Backbone.View.extend({
   },
 
   submit: function() {
-    var data = {
-      title: $("#news-title").val(),
-      content: this.editor.getValue()
-    };
+    var data = {};
+    data[this.title] = $("#news-title").val();
+    data[this.content] = this.editor.getValue();
     this.model.save(data, {
       success: this.success,
       error  : this.error
