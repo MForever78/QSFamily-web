@@ -10,6 +10,7 @@ var sessionModel = new SessionModel({
 });
 
 var NewsModel = require('./models/news');
+var MessageView = require('./views/message');
 
 Backbone.ajax = function(request) {
   // Add auth header if user has logged in
@@ -84,22 +85,48 @@ var Router = Backbone.Router.extend({
   },
 
   write: function() {
-    var WriteView = require('./views/write');
-    new WriteView({
+    var self = this;
+    var EditorView = require('./views/editor');
+    new EditorView({
       el: $('#main'),
-      sessionModel: sessionModel,
-      itemModel: new NewsModel,
-      router: this
+      model: new NewsModel,
+      success: function() {
+        var messageView = MessageView.instance || new MessageView({
+            sessionModel: sessionModel
+          });
+        messageView.display({
+          type: 'success',
+          parent: $("#write-wrap"),
+          message: "发布成功",
+          icon: "checkmark"
+        });
+        setTimeout(function() {
+          self.navigate("/", { trigger: true });
+        }, 600);
+      }
     });
   },
 
   edit: function(newsid) {
-    var EditView = require('./views/edit');
-    new EditView({
+    var self = this;
+    var EditorView = require('./views/editor');
+    new EditorView({
       el: $('#main'),
-      sessionModel: sessionModel,
-      itemModel: new NewsModel({id: newsid}),
-      router: this
+      model: new NewsModel({id: newsid}),
+      success: function() {
+        var messageView = MessageView.instance || new MessageView({
+            sessionModel: sessionModel
+          });
+        messageView.display({
+          type: 'success',
+          parent: $("#write-wrap"),
+          message: "更新成功",
+          icon: "checkmark"
+        });
+        setTimeout(function() {
+          self.navigate("/news/" + newsid, { trigger: true });
+        }, 600);
+      }
     });
   },
 
