@@ -2215,6 +2215,13 @@ var sessionModel = new SessionModel({
 });
 
 var NewsModel = require('./models/news');
+var CourseModel = require('./models/course');
+var MessageView = require('./views/message');
+
+var NavView = require('./views/nav');
+var navView = new NavView({
+  sessionModel: sessionModel
+});
 
 Backbone.ajax = function(request) {
   // Add auth header if user has logged in
@@ -2234,10 +2241,12 @@ var Router = Backbone.Router.extend({
     "news/:id": "news",
     "login": "login",
     "logout": "logout",
-    "write": "write",
-    "edit/:id": "edit",
+    "write/news": "writeNews",
+    "edit/news/:id": "editNews",
     "course": "courseList",
     "course/:id": "course",
+    "write/course": "writeCourse",
+    "edit/course/:id": "editCourse",
 
     "*notFound": "notFound"
   },
@@ -2257,6 +2266,9 @@ var Router = Backbone.Router.extend({
   },
 
   index: function() {
+    navView.render({
+      id: 'index'
+    });
     var IndexView = require("./views/index");
     new IndexView({
       el: $('#main'),
@@ -2265,16 +2277,22 @@ var Router = Backbone.Router.extend({
   },
 
   news: function(newsid) {
+    navView.render({
+      id: 'index'
+    });
     var NewsView = require("./views/news");
     new NewsView({
       el: $("#main"),
       sessionModel: sessionModel,
-      newsModel: new NewsModel({id: newsid}),
+      model: new NewsModel({id: newsid}),
       router: this
     });
   },
 
   login: function() {
+    navView.render({
+      id: "login"
+    });
     var LoginView = require("./views/login");
     new LoginView({
       el: $('#main'),
@@ -2288,27 +2306,122 @@ var Router = Backbone.Router.extend({
     window.location.href = '';
   },
 
-  write: function() {
-    var WriteView = require('./views/write');
-    new WriteView({
+  writeNews: function() {
+    navView.render({
+      id: "write"
+    });
+    var self = this;
+    var EditorView = require('./views/editor');
+    new EditorView({
       el: $('#main'),
-      sessionModel: sessionModel,
-      itemModel: new NewsModel,
-      router: this
+      model: new NewsModel,
+      title: "title",
+      content: "content",
+      success: function() {
+        var messageView = MessageView.instance || new MessageView({
+            sessionModel: sessionModel
+          });
+        messageView.display({
+          type: 'success',
+          parent: $("#write-wrap"),
+          message: "发布成功",
+          icon: "checkmark"
+        });
+        setTimeout(function() {
+          self.navigate("/", { trigger: true });
+        }, 600);
+      }
     });
   },
 
-  edit: function(newsid) {
-    var EditView = require('./views/edit');
-    new EditView({
+  editNews: function(newsid) {
+    navView.render({
+      id: "index"
+    });
+    var self = this;
+    var EditorView = require('./views/editor');
+    new EditorView({
       el: $('#main'),
-      sessionModel: sessionModel,
-      itemModel: new NewsModel({id: newsid}),
-      router: this
+      model: new NewsModel({id: newsid}),
+      title: "title",
+      content: "content",
+      success: function() {
+        var messageView = MessageView.instance || new MessageView({
+            sessionModel: sessionModel
+          });
+        messageView.display({
+          type: 'success',
+          parent: $("#write-wrap"),
+          message: "更新成功",
+          icon: "checkmark"
+        });
+        setTimeout(function() {
+          self.navigate("/news/" + newsid, { trigger: true });
+        }, 600);
+      }
+    });
+  },
+
+  writeCourse: function() {
+    navView.render({
+      id: "index"
+    });
+    var self = this;
+    var EditorView = require('./views/editor');
+    new EditorView({
+      el: $('#main'),
+      model: new CourseModel,
+      title: "course_name",
+      content: "description",
+      success: function() {
+        var messageView = MessageView.instance || new MessageView({
+            sessionModel: sessionModel
+          });
+        messageView.display({
+          type: 'success',
+          parent: $("#write-wrap"),
+          message: "新建成功",
+          icon: "checkmark"
+        });
+        setTimeout(function() {
+          self.navigate("/course", { trigger: true });
+        }, 600);
+      }
+    });
+  },
+
+  editCourse: function(courseId) {
+    navView.render({
+      id: "index"
+    });
+    var self = this;
+    var EditorView = require('./views/editor');
+    new EditorView({
+      el: $('#main'),
+      title: "course_name",
+      content: "description",
+      model: new CourseModel({id: courseId}),
+      success: function() {
+        var messageView = MessageView.instance || new MessageView({
+            sessionModel: sessionModel
+          });
+        messageView.display({
+          type: 'success',
+          parent: $("#write-wrap"),
+          message: "更新成功",
+          icon: "checkmark"
+        });
+        setTimeout(function() {
+          self.navigate("/course", { trigger: true });
+        }, 600);
+      }
     });
   },
 
   courseList: function() {
+    navView.render({
+      id: "course"
+    });
     var CourseListView = require('./views/course-list.js');
     new CourseListView({
       el: $('#main'),
@@ -2332,9 +2445,21 @@ $(function() {
   });
 });
 
-},{"./models/news":17,"./models/session":18,"./views/course-list.js":19,"./views/edit":20,"./views/index":21,"./views/login":22,"./views/news":25,"./views/write":26}],16:[function(require,module,exports){
+},{"./models/course":16,"./models/news":17,"./models/session":18,"./views/course-list.js":19,"./views/editor":20,"./views/index":21,"./views/login":22,"./views/message":23,"./views/nav":24,"./views/news":25}],16:[function(require,module,exports){
 var courseModel = Backbone.Model.extend({
-  
+  urlRoot: function() {
+    return window.baseURL + '/course';
+  },
+
+  parse: function(response) {
+    if (response.code) {
+      // model use outside collection
+      if (response.code === 200) {
+        return response.course;
+      }
+    }
+    return response;
+  }
 });
 
 module.exports = courseModel;
@@ -2457,17 +2582,17 @@ module.exports = SessionModel;
 
 },{"../views/message":23,"sha.js":5}],19:[function(require,module,exports){
 var courseCollection = require('../collections/course-list');
-var NavView = require('./nav');
 
 var CourseListView = Backbone.View.extend({
   initialize: function(opt) {
     this.courseList = new courseCollection();
     this.sessionModel = opt.sessionModel;
+    this.router = opt.router;
     this.render();
   },
 
   events: {
-    "click .course-tab": function(e) {
+    "click .course-tab": function (e) {
       e.preventDefault();
       // active tab
       var tab = $(e.currentTarget);
@@ -2477,28 +2602,39 @@ var CourseListView = Backbone.View.extend({
       var content = $(e.target.attributes.href.value);
       // remove in first to let animation work
       content.siblings().removeClass("in");
-      setTimeout(function() {
+      setTimeout(function () {
         content.siblings().removeClass("active");
         content.addClass("active in");
       }, 200);
+    },
+    "click a[data-action=edit]": function (e) {
+      this.router.navigate("/edit/course/" + e.target.dataset.id, { trigger: true });
+    },
+    "click a[data-action=delete]": function (e) {
+      var self = this;
+      var course = this.courseList.get(e.target.dataset.id);
+      course.destroy({success: function() {
+        self.render();
+      }});
+    },
+    "click a[data-action=new]": function() {
+      this.router.navigate("/write/course", { trigger: true });
     }
   },
 
   render: function() {
     var self = this;
+    var template = _.template($("#course-list-template").html());
     this.courseList.fetch({
       success: function(courseList) {
-        var template = _.template($("#course-list-template").html());
-        self.$el.html(template({courseList: courseList}));
+        var editable = self.sessionModel.profile.role === "teacher";
+        self.$el.html(template({
+          courseList: courseList,
+          editable: editable
+        }));
         // active first tab
         $(".course-tab a").first().click();
       }
-    });
-    var navView = NavView.instance || new NavView({
-      sessionModel: this.sessionModel
-    });
-    navView.render({
-      id: 'course'
     });
   }
 });
@@ -2506,33 +2642,25 @@ var CourseListView = Backbone.View.extend({
 module.exports = CourseListView;
 
 
-},{"../collections/course-list":13,"./nav":24}],20:[function(require,module,exports){
+},{"../collections/course-list":13}],20:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/12.
  */
 
-var MessageView = require("./message");
-var NavView = require("./nav");
-
-var EditView = Backbone.View.extend({
+var EditorView = Backbone.View.extend({
   initialize: function(opt) {
-    this.itemModel = opt.itemModel;
-    this.sessionModel = opt.sessionModel;
-    this.router = opt.router;
+    this.success = opt.success;
+    this.error = opt.error;
+    this.title = opt.title;
+    this.content = opt.content;
     this.render();
   },
 
   events: {
-    "click #news-submit": "update"
+    "click #news-submit": "submit"
   },
 
   render: function() {
-    var navView = NavView.instance || new NavView({
-      sessionModel: this.sessionModel
-    });
-    navView.render({
-      id: 'edit'
-    });
     var template = _.template($("#write-template").html());
     this.$el.html(template());
     var self = this;
@@ -2541,43 +2669,32 @@ var EditView = Backbone.View.extend({
         self.editor = new Simditor({
           textarea: $("#news-content")
         });
-        self.itemModel.fetch({success: function(data) {
-          $("#news-title").val(data.get('title'));
-          self.editor.setValue(data.get('content'));
-        }});
+        if (!self.model.isNew()) {
+          self.model.fetch({success: function(data) {
+            $("#news-title").val(data.get(self.title));
+            self.editor.setValue(data.get(self.content));
+          }});
+        }
       })
       .fail(function() {
         console.log("simditor load failed");
       });
   },
 
-  update: function() {
-    var data = {
-      title: $("#news-title").val(),
-      content: this.editor.getValue()
-    };
-    var self = this;
-    this.itemModel.save(data, {success: function() {
-      var messageView = MessageView.instance || new MessageView({
-          sessionModel: this.sessionModel
-        });
-      messageView.display({
-        type: 'success',
-        parent: $("#write-wrap"),
-        message: "更新成功",
-        icon: "checkmark"
-      });
-      setTimeout(function() {
-        self.router.navigate("news/" + self.itemModel.id, { trigger: true })
-      }, 600);
-    }});
+  submit: function() {
+    var data = {};
+    data[this.title] = $("#news-title").val();
+    data[this.content] = this.editor.getValue();
+    this.model.save(data, {
+      success: this.success,
+      error  : this.error
+    });
   }
 });
 
-module.exports = EditView;
+module.exports = EditorView;
 
-},{"./message":23,"./nav":24}],21:[function(require,module,exports){
-var NavView = require("./nav");
+},{}],21:[function(require,module,exports){
 var NewsList = require("../collections/news-list");
 
 var IndexView = Backbone.View.extend({
@@ -2588,12 +2705,6 @@ var IndexView = Backbone.View.extend({
   },
 
   render: function() {
-    var navView = NavView.instance || new NavView({
-        sessionModel: this.sessionModel
-    });
-    navView.render({
-      id: 'index'
-    });
     var self = this;
     var template = _.template($('#index-template').html());
     this.newsList.fetch({success: function(newsList) {
@@ -2604,13 +2715,12 @@ var IndexView = Backbone.View.extend({
 
 module.exports = IndexView;
 
-},{"../collections/news-list":14,"./nav":24}],22:[function(require,module,exports){
+},{"../collections/news-list":14}],22:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/8.
  */
 
 var MessageView = require('./message');
-var NavView = require('./nav');
 
 var LoginView = Backbone.View.extend({
   initialize: function(opt) {
@@ -2620,12 +2730,6 @@ var LoginView = Backbone.View.extend({
   },
 
   render: function() {
-    var navView = NavView.instance || new NavView({
-      sessionModel: this.sessionModel
-    });
-    navView.render({
-      id: 'login'
-    });
     var template = _.template($("#login-template").html());
     this.$el.html(template({}));
   },
@@ -2667,7 +2771,7 @@ var LoginView = Backbone.View.extend({
 
 module.exports = LoginView;
 
-},{"./message":23,"./nav":24}],23:[function(require,module,exports){
+},{"./message":23}],23:[function(require,module,exports){
 /**
  * Created by MForever78 on 15/6/9.
  */
@@ -2747,7 +2851,7 @@ var NavView = Backbone.View.extend({
       {
         id: "write",
         name: "撰写公告",
-        url: "/write"
+        url: "/write/news"
       },
       {
         id: "logout",
@@ -2758,6 +2862,7 @@ var NavView = Backbone.View.extend({
   },
 
   render: function(opt) {
+    this.$el = $("#navbar");
     var template = _.template($('#nav-template').html());
     if (this.sessionModel.loggedIn()) {
       this.$el.html(template({ navList: this.navList.teacher }));
@@ -2779,13 +2884,11 @@ module.exports = NavView;
  */
 
 var MessageView = require("./message");
-var NavView = require("./nav");
 
 var NewsView = Backbone.View.extend({
   initialize: function(opt) {
     this.sessionModel = opt.sessionModel;
     this.router = opt.router;
-    this.newsModel = opt.newsModel;
     this.render();
   },
 
@@ -2795,15 +2898,9 @@ var NewsView = Backbone.View.extend({
   },
 
   render: function() {
-    var navView = NavView.instance || new NavView({
-      sessionModel: this.sessionModel
-    });
-    navView.render({
-      id: 'index'
-    });
     var template = _.template($("#news-template").html());
     var self = this;
-    this.newsModel.fetch({success: function(news) {
+    this.model.fetch({success: function(news) {
       var editable = self.sessionModel.profile.role === 'teacher';
       self.$el.html(template({
         editable: editable,
@@ -2814,13 +2911,13 @@ var NewsView = Backbone.View.extend({
 
   editNews: function(event) {
     event.preventDefault();
-    this.router.navigate("edit/" + this.newsModel.id, { trigger: true });
+    this.router.navigate("edit/news/" + this.model.id, { trigger: true });
   },
 
   deleteNews: function(event) {
     event.preventDefault();
     var self = this;
-    this.newsModel.destroy({success: function() {
+    this.model.destroy({success: function() {
       var messageView = MessageView.instance || new MessageView;
       messageView.display({
         type: 'success',
@@ -2837,55 +2934,4 @@ var NewsView = Backbone.View.extend({
 
 module.exports = NewsView;
 
-},{"./message":23,"./nav":24}],26:[function(require,module,exports){
-/**
- * Created by MForever78 on 15/6/9.
- */
-
-var NavView = require('./nav');
-
-var WriteView = Backbone.View.extend({
-  initialize: function(opt) {
-    this.sessionModel = opt.sessionModel;
-    this.itemModel = opt.itemModel;
-    this.router = opt.router;
-    this.render();
-  },
-
-  render: function() {
-    var navView = NavView.instance || new NavView({
-        sessionModel: this.sessionModel
-    });
-    navView.render({
-      id: "write"
-    });
-    var template = _.template($("#write-template").html());
-    this.$el.html(template({}));
-    var self = this;
-    $.getScript("/static/lib/simditor.min.js", function() {
-      self.editor = new Simditor({
-        textarea: $("#news-content")
-      });
-    });
-  },
-
-  events: {
-    "click #news-submit": function(event) {
-      event.preventDefault();
-      var self = this;
-      var data = {
-        title  : $("#news-title").val(),
-        content: this.editor.getValue()
-      };
-      this.itemModel.save(data, {
-        success: function () {
-          self.router.navigate('', { trigger: true });
-        }
-      });
-    }
-  }
-});
-
-module.exports = WriteView;
-
-},{"./nav":24}]},{},[15])
+},{"./message":23}]},{},[15])

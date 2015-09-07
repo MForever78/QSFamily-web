@@ -165,9 +165,24 @@ article {
 }
 .course-content {
   display: none;
+  position: relative;
 }
 .course-content.active {
   display: block;
+}
+.course-add {
+  padding: 10px 20px;
+  font-size: .9em;
+}
+.course-edit {
+  position: absolute;
+  width: 100px;
+  right: -130px;
+  padding: 0;
+}
+.course-edit li {
+  list-style: none;
+  line-height: 2em;
 }
 .is-hidden {
   display: none;
