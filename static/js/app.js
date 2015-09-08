@@ -2254,7 +2254,8 @@ var Router = Backbone.Router.extend({
   publicMethod: [
     "index",
     "news",
-    "login"
+    "login",
+    "courseList"
   ],
 
   execute: function(callback, args, name) {
@@ -2627,7 +2628,7 @@ var CourseListView = Backbone.View.extend({
     var template = _.template($("#course-list-template").html());
     this.courseList.fetch({
       success: function(courseList) {
-        var editable = self.sessionModel.profile.role === "teacher";
+        var editable = self.sessionModel.loggedIn() && self.sessionModel.profile.role === "teacher";
         self.$el.html(template({
           courseList: courseList,
           editable: editable
