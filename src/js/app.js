@@ -49,7 +49,8 @@ var Router = Backbone.Router.extend({
   publicMethod: [
     "index",
     "news",
-    "login"
+    "login",
+    "courseList"
   ],
 
   execute: function(callback, args, name) {
