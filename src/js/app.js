@@ -22,9 +22,7 @@ Backbone.ajax = function(request) {
   // Add auth header if user has logged in
   if (sessionModel.loggedIn()) {
     return $.ajax(_.extend(request, {
-      headers: {
-        Authorization: "Bearer " + sessionModel.token
-      }
+      headers: { Authorization: "Bearer " + sessionModel.token }
     }));
   }
   return $.ajax(request);

@@ -43,7 +43,11 @@ var SessionModel = Backbone.Model.extend({
   },
 
   loggedIn: function() {
-    return this.token;
+    return !_.isNull(this.token);
+  },
+
+  isRole: function(role) {
+    return this.loggedIn() && this.profile.role === role;
   },
 
   login: function(role, username, password) {

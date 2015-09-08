@@ -20,7 +20,7 @@ var NewsView = Backbone.View.extend({
     var template = _.template($("#news-template").html());
     var self = this;
     this.model.fetch({success: function(news) {
-      var editable = self.sessionModel.profile.role === 'teacher';
+      var editable = self.sessionModel.isRole("teacher");
       self.$el.html(template({
         editable: editable,
         news: news
