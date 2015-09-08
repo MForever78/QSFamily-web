@@ -2,7 +2,7 @@
  * Created by MForever78 on 15/6/3.
  */
 
-window.baseURL = "http://qsfamily.mforever78.com:3000";
+window.baseURL = "http://gofp.ga:3000";
 
 var SessionModel = require('./models/session');
 var sessionModel = new SessionModel({
