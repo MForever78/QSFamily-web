@@ -2227,9 +2227,7 @@ Backbone.ajax = function(request) {
   // Add auth header if user has logged in
   if (sessionModel.loggedIn()) {
     return $.ajax(_.extend(request, {
-      headers: {
-        Authorization: "Bearer " + sessionModel.token
-      }
+      headers: { Authorization: "Bearer " + sessionModel.token }
     }));
   }
   return $.ajax(request);
@@ -2542,7 +2540,11 @@ var SessionModel = Backbone.Model.extend({
   },
 
   loggedIn: function() {
-    return this.token;
+    return !_.isNull(this.token);
+  },
+
+  isRole: function(role) {
+    return this.loggedIn() && this.profile.role === role;
   },
 
   login: function(role, username, password) {
@@ -2628,7 +2630,7 @@ var CourseListView = Backbone.View.extend({
     var template = _.template($("#course-list-template").html());
     this.courseList.fetch({
       success: function(courseList) {
-        var editable = self.sessionModel.loggedIn() && self.sessionModel.profile.role === "teacher";
+        var editable = self.sessionModel.isRole("teacher");
         self.$el.html(template({
           courseList: courseList,
           editable: editable
@@ -2902,7 +2904,7 @@ var NewsView = Backbone.View.extend({
     var template = _.template($("#news-template").html());
     var self = this;
     this.model.fetch({success: function(news) {
-      var editable = self.sessionModel.profile.role === 'teacher';
+      var editable = self.sessionModel.isRole("teacher");
       self.$el.html(template({
         editable: editable,
         news: news
